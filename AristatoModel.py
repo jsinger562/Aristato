@@ -22,6 +22,8 @@ class TwoLayerAristato(nn.Module):
         return out
 
 def train(model, dataloader, loss_func, optimizer, num_epoch, correct_num_func=None, print_info=True):
+    # trains model and collects data for average losses, and average accuracy
+    # much of this code is the same as that used in HW11
     average_losses = np.zeros(num_epoch)
     accuracy = np.zeros(num_epoch)
     model.train()
@@ -49,11 +51,11 @@ def train(model, dataloader, loss_func, optimizer, num_epoch, correct_num_func=N
             if correct_num_func:
                 print('Accuracy: {:.4f}%'.format(epoch_correct_num / len(dataloader.dataset) * 100), end="")
             print()
-        
-        if correct_num_func is None:
-            return average_losses
-        else:
-            return average_losses, accuracy
+    
+    if correct_num_func is None:
+        return average_losses
+    else:
+        return average_losses, accuracy
         
 
 def test(model, dataloader, loss_func, correct_num_func=None):
@@ -66,7 +68,8 @@ def test(model, dataloader, loss_func, correct_num_func=None):
             loss = loss_func(outputs, Y)
             sum_loss += loss.item()*X.shape[0]
             if correct_num_func is not None:
-                correct_predictions += correct_num_func(outputs, Y)
+                correct_predictions_increase= correct_num_func(outputs, Y)
+                correct_predictions += correct_predictions_increase
     if correct_num_func is None:
         return sum_loss/len(dataloader.dataset)
     else:
@@ -76,8 +79,8 @@ def test(model, dataloader, loss_func, correct_num_func=None):
 def correct_predict_num(logit, target):
     total = 0
     for i in range(len(logit)):
-        if logit[i] > 0.7 and target[i] == 1:
+        if logit[i] > 0.5 and target[i] == 1:
             total +=1
-        elif logit[i] < 0.3 and target[i] == 0:
+        elif logit[i] < 0.5 and target[i] == 0:
             total += 1
     return total
