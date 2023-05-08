@@ -80,3 +80,5 @@ def get_loader(batch_size, test_size=0.1):
     dataloader_test = DataLoader(dataset_test, batch_size=batch_size, shuffle=True)
 
     return dataloader_train, dataloader_test
+
+feed_bert_and_write()
