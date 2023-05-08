@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 
 def visualize_loss(losses):
     """
+    Credit to ML TAs
     Uses Matplotlib to visualize loss per batch.
     :return: None
     """
@@ -21,6 +22,7 @@ def visualize_loss(losses):
 
 def visualize_accuracy(accuracies):
     """
+    Credit to ML TAs
     Uses Matplotlib to visualize accuracy per batch.
     :return: None
     """
@@ -32,8 +34,10 @@ def visualize_accuracy(accuracies):
     plt.show()
 
 def test_Aristato(test_size=0.2):
+    # this method tests the Aristato model and prits its results
+    # much of the code here has been taken from HW11
     batch_size=64
-    num_epoch = 25
+    num_epoch = 500
     learning_rate = 0.01
     dataloader_train, dataloader_test = get_loader(batch_size, test_size)
     model = TwoLayerAristato()
@@ -45,11 +49,8 @@ def test_Aristato(test_size=0.2):
     loss_test, accuracy_test = test(model, dataloader_test, loss_func, correct_num_func=correct_predict_num)
     print('Average Training Loss: {:.4f} | Average Training Accuracy: {:.4f}%'.format(loss_train, accuracy_train * 100))
     print('Average Testing Loss: {:.4f} | Average Testing Accuracy: {:.4f}%'.format(loss_test, accuracy_test * 100))
-
     visualize_loss(losses)
     visualize_accuracy(accuracies)
-
-
     return loss_test
 
 def main():
