@@ -34,23 +34,6 @@ for sentence in list_of_sentences:
 file2.close()
 # need to remove end of line, *blabla*, [blabla], {blabla}
 file1.close()
-print("The number of words in the Republic is: ")
-print(len(new_text.split()))
-
-file3 = open("data/Protagoras.txt", "r")
-new_text = file3.read().replace('\n', ' ')
-new_text = new_text.replace("--", " ")
-new_text = new_text.replace("  ", " ")
-new_text = new_text.replace("  ", " ")
-new_text = new_text.replace("  ", " ")
-new_text = re.sub(r'[^\w\s\'\"]', '', new_text)
-list_of_sentences = break_into_chunks(new_text, 15)
-file4 = open("data/NewProtagoras.txt", 'w')
-for sentence in list_of_sentences:
-    file4.write(sentence + '\n')
-file4.close()
-file3.close()
-
 
 
 # Chapter and book markers manually removed from NE
