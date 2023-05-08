@@ -3,7 +3,6 @@ from torch.utils.data import DataLoader, Dataset
 import torch
 import numpy as np
 from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
 
 
 class PhilosophyDataset(Dataset):
@@ -21,6 +20,7 @@ class PhilosophyDataset(Dataset):
 
 
 def get_embeddings(data, model, tokenizer):
+    # uses BERT model to get sequence embeddings of data
     inputs = tokenizer(data, padding=True, truncation=True, return_tensors="pt")
 
     outputs = model(**inputs)
@@ -31,45 +31,47 @@ def get_embeddings(data, model, tokenizer):
     return embeddings
 
 def write_embeddings(embeddings, label):
+    # writes embeddings to new txt file with label as first entry
     file = open("data/bert.txt", "a")
     for embedding in embeddings:
         file.write(str(label) + " " + ' '.join(map(str, embedding)) + "\n")
     file.close()
 
-
-
-def get_loader(batch_size, test_size=0.2):
-    pull_size = 2
+def feed_bert_and_write():
+    # uses the two functions above to get and write embeddings to new file
+    pull_size = 500
     file1 = open("data/NewNE.txt", "r")
     all_sentences = file1.read().splitlines()
 
     model_name = "bert-base-uncased"
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModel.from_pretrained(model_name)
-    X = get_embeddings(all_sentences[:pull_size], model, tokenizer).astype(np.float32)
-    Y = np.ones(len(X))
-    for i in range(1, 3):
+    for i in range(12):
         sentences = all_sentences[i*pull_size:(i+1)*pull_size]
         embeddings = get_embeddings(sentences, model, tokenizer)
         X_batch = embeddings.astype(np.float32)
         write_embeddings(X_batch, 1)
-        Y_batch = np.ones(len(X_batch))
-        X = np.concatenate((X, X_batch), axis=0)
-        Y = np.hstack((Y, Y_batch))
     file1.close()
     file2 = open("data/NewRepublic.txt", "r")
     all_sentences = file2.read().splitlines()
-    for i in range(3):
+    for i in range(12):
         sentences = all_sentences[i*pull_size:(i+1)*pull_size]
         embeddings = get_embeddings(sentences, model, tokenizer)
         X_batch = embeddings.astype(np.float32)
-        Y_batch = np.zeros(len(X_batch))
-        X = np.concatenate((X, X_batch), axis=0)
-        Y = np.hstack((Y, Y_batch))
+        write_embeddings(X_batch, 0)
     file2.close()
-    print(len(X))
-    print(Y)
+
+def get_loader(batch_size, test_size=0.1):
+    # uses newly written file with embeddings and labels to get data_loader for training
+    # much of the code here is the same as in HW11
+    data = np.loadtxt("data/bert.txt")
+    X, Y = data[:, 1:], data[:, 0]
+    X = X.astype(np.float32)
+    Y = Y.astype(np.float32)
+
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=test_size)
+    print(len(Y_test))
+    print(np.sum(Y_test))
 
     dataset_train = PhilosophyDataset(X_train, Y_train)
     dataset_test = PhilosophyDataset(X_test, Y_test)
@@ -78,20 +80,3 @@ def get_loader(batch_size, test_size=0.2):
     dataloader_test = DataLoader(dataset_test, batch_size=batch_size, shuffle=True)
 
     return dataloader_train, dataloader_test
-
-
-def visualize_loss(losses):
-    """
-    Uses Matplotlib to visualize loss per batch.
-    :return: None
-    """
-    x = np.arange(1, len(losses) + 1)
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss Value')
-    plt.title('Training Loss per Epoch')
-    plt.plot(x, losses)
-    plt.show()
-
-
-
-get_loader(10)
