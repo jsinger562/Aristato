@@ -1,7 +1,7 @@
 # Aristato
  Capstone Project
 
-    Please refer to report for a detailed explanation of this repoository.
+    Please refer to report for a detailed explanation of this repository.
 
     To run, run pre-processing.py and the feed_bert_and_write() function in feed_bert.py, then run main.py.
 
